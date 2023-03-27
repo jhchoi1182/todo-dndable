@@ -53,7 +53,7 @@ table {
 }
 body {
   background-color:${(props) => props.theme.bgColor};
-  color:${(props) => props.theme.textColor}
+  color: black
 }
 a {
   text-decoration:none;
