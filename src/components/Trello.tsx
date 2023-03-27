@@ -3,6 +3,7 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { todoState } from "../atoms";
+import DraggableCard from "./DraggableCard";
 
 const Trello = () => {
   const [todos, setTodos] = useRecoilState(todoState);
@@ -24,13 +25,7 @@ const Trello = () => {
             {(provided) => (
               <Board ref={provided.innerRef} {...provided.droppableProps}>
                 {todos.map((todo, i) => (
-                  <Draggable key={todo} draggableId={todo} index={i}>
-                    {(provided) => (
-                      <Card ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                        {todo}
-                      </Card>
-                    )}
-                  </Draggable>
+                  <DraggableCard key={todo} todo={todo} index={i} />
                 ))}
                 {provided.placeholder}
               </Board>
@@ -66,11 +61,4 @@ const Board = styled.ul`
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 5px;
   min-height: 200px;
-`;
-
-const Card = styled.li`
-  border-radius: 5px;
-  margin-bottom: 5px;
-  padding: 10px 10px;
-  background-color: ${(props) => props.theme.cardColor};
 `;
