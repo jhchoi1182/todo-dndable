@@ -7,25 +7,27 @@ import Board from "./Board";
 
 const Trello = () => {
   const [todos, setTodos] = useRecoilState(todoState);
-  const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
+  const onDragEnd = ({ destination, source }: DropResult) => {
     if (!destination) return;
     if (source.droppableId === destination?.droppableId) {
       setTodos((prev) => {
-        const todos = [...prev[source.droppableId]];
-        todos.splice(source.index, 1);
-        todos.splice(destination?.index, 0, draggableId);
+        const sourceTodos = [...prev[source.droppableId]];
+        const selectedTodo = sourceTodos[source.index];
+        sourceTodos.splice(source.index, 1);
+        sourceTodos.splice(destination?.index, 0, selectedTodo);
         return {
           ...prev,
-          [source.droppableId]: todos,
+          [source.droppableId]: sourceTodos,
         };
       });
     }
     if (destination.droppableId !== source.droppableId) {
       setTodos((prev) => {
         const sourceTodos = [...prev[source.droppableId]];
+        const selectedTodo = sourceTodos[source.index];
         const destinationTodos = [...prev[destination.droppableId]];
         sourceTodos.splice(source.index, 1);
-        destinationTodos.splice(destination.index, 0, draggableId);
+        destinationTodos.splice(destination.index, 0, selectedTodo);
         return {
           ...prev,
           [source.droppableId]: sourceTodos,
