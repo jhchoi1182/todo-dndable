@@ -3,37 +3,34 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { todoState } from "../atoms";
-import DraggableCard from "./DraggableCard";
+import Board from "./Board";
 
 const Trello = () => {
   const [todos, setTodos] = useRecoilState(todoState);
   const onDragEnd = ({ draggableId, destination, source }: DropResult) => {
-    if (!destination) return;
-    setTodos((oldTodos) => {
-      const todos = [...oldTodos];
-      todos.splice(source.index, 1);
-      todos.splice(destination?.index, 0, draggableId);
-      return todos;
-    });
+    if (source.droppableId === destination?.droppableId) {
+      setTodos((prev) => {
+        const todos = [...prev[source.droppableId]];
+        todos.splice(source.index, 1);
+        todos.splice(destination?.index, 0, draggableId);
+        return {
+          ...prev,
+          [source.droppableId]: todos,
+        };
+      });
+    }
   };
 
   return (
-    <Wrapper>
-      <Boards>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="one">
-            {(provided) => (
-              <Board ref={provided.innerRef} {...provided.droppableProps}>
-                {todos.map((todo, i) => (
-                  <DraggableCard key={todo} todo={todo} index={i} />
-                ))}
-                {provided.placeholder}
-              </Board>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </Boards>
-    </Wrapper>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Wrapper>
+        <Boards>
+          {Object.keys(todos).map((boardId) => (
+            <Board boardId={boardId} key={boardId} todos={todos[boardId]} />
+          ))}
+        </Boards>
+      </Wrapper>
+    </DragDropContext>
   );
 };
 
@@ -41,8 +38,7 @@ export default Trello;
 
 const Wrapper = styled.div`
   display: flex;
-  max-width: 480px;
-  width: 100%;
+  width: 100vw;
   margin: 0 auto;
   justify-content: center;
   align-items: center;
@@ -50,15 +46,9 @@ const Wrapper = styled.div`
 `;
 
 const Boards = styled.div`
-  display: grid;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   width: 100%;
-  grid-template-columns: repeat(1, 1fr);
-`;
-
-const Board = styled.ul`
-  padding: 20px 10px;
-  padding-top: 30px;
-  background-color: ${(props) => props.theme.boardColor};
-  border-radius: 5px;
-  min-height: 200px;
+  gap: 10px;
 `;
