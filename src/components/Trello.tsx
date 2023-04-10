@@ -4,9 +4,23 @@ import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { todoState } from "../atoms";
 import Board from "./Board";
+import { useForm } from "react-hook-form";
+
+interface IForm {
+  category: string;
+}
 
 const Trello = () => {
   const [todos, setTodos] = useRecoilState(todoState);
+  const { register, setValue, handleSubmit } = useForm<IForm>();
+
+  const addCategory = ({ category }: IForm) => {
+    setTodos((prev) => {
+      return { [category]: [], ...prev };
+    });
+    setValue("category", "");
+  };
+
   const onDragEnd = ({ destination, source }: DropResult) => {
     if (!destination) return;
     if (source.droppableId === destination?.droppableId) {
@@ -40,11 +54,20 @@ const Trello = () => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
-        <Boards>
-          {Object.keys(todos).map((boardId) => (
-            <Board boardId={boardId} key={boardId} todos={todos[boardId]} />
-          ))}
-        </Boards>
+        <form onSubmit={handleSubmit(addCategory)}>
+          <AddBoardInput
+            {...register("category", { required: true })}
+            type="text"
+            placeholder="추가할 카테고리를 입력해주세요."
+          />
+        </form>
+        <BoardContainer>
+          <Boards>
+            {Object.keys(todos).map((boardId) => (
+              <Board boardId={boardId} key={boardId} todos={todos[boardId]} />
+            ))}
+          </Boards>
+        </BoardContainer>
       </Wrapper>
     </DragDropContext>
   );
@@ -53,18 +76,28 @@ const Trello = () => {
 export default Trello;
 
 const Wrapper = styled.div`
-  display: flex;
-  width: 100vw;
-  margin: 0 auto;
-  justify-content: center;
-  align-items: center;
+  display: block;
+  width: 85vw;
   height: 100vh;
+  margin: 0 auto;
+  padding-top: 5%;
+`;
+
+const AddBoardInput = styled.input`
+  display: block;
+  margin: 0 auto 30px;
+  width: 230px;
+`;
+
+const BoardContainer = styled.div`
+  display: flex;
+  justify-content: center;
 `;
 
 const Boards = styled.div`
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  flex-wrap: wrap;
   width: 100%;
   gap: 10px;
 `;

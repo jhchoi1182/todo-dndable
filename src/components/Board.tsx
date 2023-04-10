@@ -3,16 +3,16 @@ import { Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { ITodo, todoState } from "../atoms";
+import { IToDoState, ITodo, todoState } from "../atoms";
 import DraggableCard from "./DraggableCard";
+
+interface IForm {
+  todo: string;
+}
 
 interface IBoardPros {
   todos: ITodo[];
   boardId: string;
-}
-
-interface IForm {
-  todo: string;
 }
 
 interface IAreaProps {
